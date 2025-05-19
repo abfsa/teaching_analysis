@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    networks:
+      - analysis-net
+
+  worker:
+    build: .
+    command: celery -A app.tasks.celery_app worker --loglevel=info -P solo
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    networks:
+      - analysis-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - analysis-net
+
+volumes:
+  redis_data:
+
+networks:
+  analysis-net:
+    driver: bridge
