@@ -2,7 +2,7 @@ from app.config import settings
 
 def analyze_content(content: str) -> dict:
     """
-    示例分析函数，实际应替换为用户现有的分析逻辑
+    示例分析函数，实际应替换为现有的分析逻辑
     """
     # 示例返回结构，实际实现需包含：
     # 1. 文本预处理

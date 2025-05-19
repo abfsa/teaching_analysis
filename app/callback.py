@@ -1,12 +1,11 @@
-from celery import shared_task
+from app.tasks import celery_app
 import httpx
 from app.config import settings
 
-@shared_task(bind=True, max_retries=3)
-def send_result(self, result):
+@celery_app.task(bind=True, max_retries=3)
+def send_result(self, result, callback_url: str):
     try:
-        # 实际回调地址应由调用方提供，此处为示例
-        resp = httpx.post("https://callback.example.com/api/results", 
+        resp = httpx.post(callback_url, 
                          json=result,
                          timeout=settings.download_timeout)
         resp.raise_for_status()
