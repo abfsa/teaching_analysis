@@ -9,3 +9,13 @@ pydantic-settings==2.2.1
 async_timeout>=4.0
 anyio>=4.0
 loguru>=0.7
+python-docx>=1.1.2
+python-pptx>=0.6.23
+pymupdf>=1.24.0
+lxml>=5.1.0
+openai>=1.79.0
+numpy>=1.26.4
+matplotlib>=3.8.4
+requests>=2.28.0
+python-dotenv>=1.0.0
+types-requests>=2.28.0
