@@ -1,4 +1,3 @@
-from app.tasks import celery_app
 import httpx
 from .config import settings
 from loguru import logger

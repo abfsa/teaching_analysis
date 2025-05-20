@@ -9,10 +9,8 @@ from .util import *
 
 ## 设置API
 
-api_key =  "sk-630e9863feb8434da9691cb3f98339f5"
+api_key =  os.environ["OPENAI_API_KEY"]
 base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-
-os.environ["OPENAI_API_KEY"]  =  api_key
 
 client = OpenAI(
   api_key= api_key,
