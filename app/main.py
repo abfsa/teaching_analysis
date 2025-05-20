@@ -1,36 +1,42 @@
 from fastapi import FastAPI, HTTPException
 from celery import chain
-from pydantic import BaseModel, HttpUrl
-from app.config import settings
-from app.tasks import download_and_analyze
+from pydantic import BaseModel, HttpUrl, Field
 import uuid
+from .tasks import download_task, analyze_task, callback_task
 
-app = FastAPI(title="Teaching Video Analysis Service")
+app = FastAPI(title="Teaching Video Analysis Service",
+              description="接收视频/教案，下载，分析，回调",)
+
+class DataUrls(BaseModel):
+    video: HttpUrl = Field(..., description="视频下载地址")
+    outline: HttpUrl = Field(..., description="教案/大纲下载地址")
+
 
 class SubmitReq(BaseModel):
-    video_url: HttpUrl
-    callback_url: HttpUrl
-    extra: dict | None = None
+    hid: str = Field(..., description="用户或课程唯一标识 HID")
+    objectid: str = Field(..., description="对象 ID")
+    data: DataUrls
+
 
 class SubmitResp(BaseModel):
     task_id: str
-    status: str = "queued"
 
 @app.post("/submit", response_model=SubmitResp)
 async def submit(req: SubmitReq):
-    task_id = str(uuid.uuid4())
-    task_chain = chain(
-        download_and_analyze.s(
-            str(req.video_url), 
-            str(req.callback_url),
-            req.extra
-        )
-    )
-    result = task_chain.apply_async(
-        broker=settings.redis_url,
-        backend=settings.task_result_backend
-    )
-    return SubmitResp(task_id=task_id)
+    hid, obj_id = req.hid, req.objectid
+    video_url = str(req.data.video)
+    outline_url = str(req.data.outline)
+
+    try:
+        job = chain(
+            download_task.s(video_url, outline_url),
+            analyze_task.s(),
+            callback_task.s(hid=hid, objectid=obj_id),
+        ).apply_async()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return SubmitResp(task_id=job.id)
 
 @app.get("/health")
 def health():
