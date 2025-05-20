@@ -12,7 +12,7 @@ def download_and_analyze(self, url: str, callback_url: str):
         with tempfile.TemporaryDirectory() as tmp:
             dst = Path(tmp) / "video.mp4"
             asyncio.run(async_download(url, dst))
-            analysis = analyze_content(dst)
+            analysis = analyze_content(dst, output_path)
         send_result.delay(result=analysis, callback_url=callback_url)
         return analysis
     except Exception as exc:
