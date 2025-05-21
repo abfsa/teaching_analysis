@@ -13,6 +13,7 @@ class DataUrls(BaseModel):
 
 
 class SubmitReq(BaseModel):
+    fid: str = Field(..., description="文件或课程唯一标识 FID")
     hid: str = Field(..., description="用户或课程唯一标识 HID")
     objectid: str = Field(..., description="对象 ID")
     data: DataUrls
@@ -23,7 +24,7 @@ class SubmitResp(BaseModel):
 
 @app.post("/submit", response_model=SubmitResp)
 async def submit(req: SubmitReq):
-    hid, obj_id = req.hid, req.objectid
+    fid, hid, obj_id = req.fid, req.hid, req.objectid
     video_url = str(req.data.video)
     outline_url = str(req.data.outline)
 
@@ -31,7 +32,7 @@ async def submit(req: SubmitReq):
         job = chain(
             download_task.s(video_url, outline_url),
             analyze_task.s(),
-            callback_task.s(hid=hid, objectid=obj_id),
+            callback_task.s(hid=hid, objectid=obj_id, fid=fid),
         ).apply_async()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -20,7 +20,7 @@ def download_task(video_url: str, outline_url: str) -> tuple[str, str]:
     workdir = TMP_ROOT / uuid.uuid4().hex
     workdir.mkdir(parents=True, exist_ok=True)
 
-    video_path   = workdir / "video.mp4"
+    video_path   = workdir / "audio.mp3"
     outline_path = workdir
     outline_file = download_file(outline_url, outline_path)         # 根据扩展名自动保存
     download_file(video_url,   video_path)
@@ -34,7 +34,7 @@ def analyze_task(paths: tuple[str, str]) -> dict:
     return result
 
 @shared_task(name="callback_task")
-def callback_task(result: dict, hid: str, objectid: str) -> None:
+def callback_task(result: dict, hid: str, objectid: str, fid: str) -> None:
     # 直接调用异步函数；Celery 允许 sync wait
     import anyio
-    anyio.run(push_result, result, hid=hid, objectid=objectid)
+    anyio.run(push_result, result, hid=hid, objectid=objectid, fid=fid)
