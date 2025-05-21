@@ -33,7 +33,7 @@ async def submit(req: SubmitReq):
 
     try:
         job = chain(
-                    download_and_analyze.s(video_url, outline_url),
+                    download_and_analyze.s(audio_url, outline_url),
                     callback_task.s(hid=hid, objectid=obj_id, fid=fid)
                 ).apply_async()
     except Exception as e:
