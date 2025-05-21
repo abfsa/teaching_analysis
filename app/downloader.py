@@ -5,7 +5,7 @@ async def async_download(
     url: str,
     dest: str | pathlib.Path,
     timeout: int = 120,
-    user_agent: str = "1234abcd"   # 8-字符 UA；默认
+    user_agent: str = "fudanai-teaching-0527"   # 8-字符 UA；默认
 ) -> pathlib.Path:
     dest = pathlib.Path(dest)
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -26,7 +26,7 @@ async def async_download(
     return dest
 
 def download_file(url: str, dest: str | pathlib.Path, timeout: int = 120,
-                  user_agent: str = "1234abcd",) -> pathlib.Path:
+                  user_agent: str = "fudanai-teaching-0527",) -> pathlib.Path:
     """
     同步包装，便于 Celery 调用。
     """
