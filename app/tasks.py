@@ -60,4 +60,5 @@ def download_and_analyze(audio_url: str, outline_url: str) -> dict:
 def callback_task(result: dict, fid: str, hid: str, objectid: str) -> None:
     # 直接调用异步函数；Celery 允许 sync wait
     import anyio
-    anyio.run(push_result, result, fid=fid, hid=hid, objectid=objectid)
+    anyio.run(lambda: push_result(result=result, fid=fid, hid=hid, objectid=objectid))
+
