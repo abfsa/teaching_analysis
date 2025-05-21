@@ -34,7 +34,7 @@ async def submit(req: SubmitReq):
     try:
         job = chain(
                     download_and_analyze.s(audio_url, outline_url),
-                    callback_task.s(hid=hid, objectid=obj_id, fid=fid)
+                    callback_task.s(fid=fid, hid=hid, objectid=obj_id)
                 ).apply_async()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
