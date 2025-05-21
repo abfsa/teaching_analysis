@@ -31,7 +31,7 @@ async def push_result(result: dict, *, fid: str, hid: str, objectid: str) -> Non
     注意：如果未来确认 objectId 也需传 hid，请把 objectid 改成 hid 即可。
     """
     enc = generate_enc(fid, hid)
-    url = f"{settings.callback_base_url}?fid={fid}&hid={hid}&objectId={hid}&enc={enc}"
+    url = f"{settings.callback_base_url}?fid={fid}&hid={hid}&objectId={objectid}&enc={enc}"
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             # **要求：把 analyze_content() 的返回值放在 body 内**

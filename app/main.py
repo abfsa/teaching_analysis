@@ -9,6 +9,7 @@ app = FastAPI(title="Teaching Video Analysis Service",
 
 class DataUrls(BaseModel):
     video: HttpUrl = Field(..., description="视频下载地址")
+    audio: HttpUrl = Field(..., description="视频下载地址")
     outline: HttpUrl = Field(..., description="教案/大纲下载地址")
 
 
@@ -26,11 +27,12 @@ class SubmitResp(BaseModel):
 async def submit(req: SubmitReq):
     fid, hid, obj_id = req.fid, req.hid, req.objectid
     video_url = str(req.data.video)
+    audio_url = str(req.data.audio)
     outline_url = str(req.data.outline)
 
     try:
         job = chain(
-            download_task.s(video_url, outline_url),
+            download_task.s(audio_url, outline_url),
             analyze_task.s(),
             callback_task.s(fid=fid, hid=hid, objectid=obj_id),
         ).apply_async()

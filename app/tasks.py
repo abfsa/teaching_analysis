@@ -13,19 +13,21 @@ celery_app.config_from_object("app.config")
 TMP_ROOT = Path(tempfile.gettempdir()) / "teaching_analysis"
 
 @shared_task(name="download_task")
-def download_task(video_url: str, outline_url: str) -> tuple[str, str]:
+def download_task(audio_url: str, outline_url: str) -> tuple[str, str]:
     """
     下载视频与教案 → 返回二者本地路径
     """
     workdir = TMP_ROOT / uuid.uuid4().hex
     workdir.mkdir(parents=True, exist_ok=True)
 
-    video_path   = workdir / "audio.mp3"
-    outline_path = workdir
+    audio_path   = workdir / "audio.mp3"
+    outline_path = workdir 
+    if outline_url == "":
+        return str(audio_path), None
     outline_file = download_file(outline_url, outline_path)         # 根据扩展名自动保存
-    download_file(video_url,   video_path)
+    download_file(audio_url,   audio_path)
 
-    return str(video_path), str(outline_file)   # 交给下游
+    return str(audio_path), str(outline_path)   # 交给下游
 
 @shared_task(name="analyze_task")
 def analyze_task(paths: tuple[str, str]) -> dict:
