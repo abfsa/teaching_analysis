@@ -3,6 +3,7 @@ from celery import chain
 from pydantic import BaseModel, HttpUrl, Field
 import uuid
 from .tasks import download_task, analyze_task, callback_task
+from typing import Union
 
 app = FastAPI(title="Teaching Video Analysis Service",
               description="接收视频/教案，下载，分析，回调",)
@@ -10,7 +11,7 @@ app = FastAPI(title="Teaching Video Analysis Service",
 class DataUrls(BaseModel):
     video: HttpUrl = Field(..., description="视频下载地址")
     audio: HttpUrl = Field(..., description="视频下载地址")
-    outline: HttpUrl = Field(..., description="教案/大纲下载地址")
+    outline: Union[HttpUrl, str] = Field("", description="教案/大纲下载地址（可选）")
 
 
 class SubmitReq(BaseModel):
