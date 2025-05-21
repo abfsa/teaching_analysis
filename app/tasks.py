@@ -35,6 +35,21 @@ def analyze_task(paths: tuple[str, str]) -> dict:
     result = analyze_content(video_path, outline_path)
     return result
 
+@shared_task(name="download_and_analyze")
+def download_and_analyze(video_url: str, outline_url: str) -> dict:
+    workdir = TMP_ROOT / uuid.uuid4().hex
+    workdir.mkdir(parents=True, exist_ok=True)
+
+    video_path   = workdir / "audio.mp3"
+    outline_file = download_file(outline_url, workdir)
+    download_file(video_url, video_path)
+
+    # —— 确保下载成功再分析
+    if not video_path.exists() or video_path.stat().st_size == 0:
+        raise RuntimeError("video download failed")
+
+    return analyze_content(str(video_path), str(outline_file))
+
 @shared_task(name="callback_task")
 def callback_task(result: dict, fid: str, hid: str, objectid: str) -> None:
     # 直接调用异步函数；Celery 允许 sync wait
