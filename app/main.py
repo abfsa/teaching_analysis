@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from celery import chain
 from pydantic import BaseModel, HttpUrl, Field
 import uuid
-from .tasks import download_task, analyze_task, callback_task
+from .tasks import download_and_analyze, callback_task
 from typing import Union
 
 app = FastAPI(title="Teaching Video Analysis Service",
@@ -33,10 +33,9 @@ async def submit(req: SubmitReq):
 
     try:
         job = chain(
-            download_task.s(audio_url, outline_url),
-            analyze_task.s(),
-            callback_task.s(fid=fid, hid=hid, objectid=obj_id),
-        ).apply_async()
+                    download_and_analyze.s(video_url, outline_url),
+                    callback_task.s(hid=hid, objectid=obj_id, fid=fid)
+                ).apply_async()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
