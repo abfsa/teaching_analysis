@@ -212,6 +212,7 @@ def traverse(node, num_node, indent, Beginner, Intermediate, Advanced, depth):
     return num_node, Beginner, Intermediate, Advanced, depth
 
 # 提取视频图谱的基本信息
+@retry_on_failure(max_retries=2)
 def extract_baseinf(tree1):
     total_time = tree1['time'][17:]
     title = tree1['name']
@@ -219,6 +220,7 @@ def extract_baseinf(tree1):
     response0 = f"本课程主要讲解{title}，视频时长{total_time}，共包含{num_node}个知识点，其中包含初级知识点（难度在1~3之间）{Beginner}个，中级知识点（难度在4~6之间）{Intermediate}个，高级知识点（难度在7~10之间）{Advanced}个。"
     return response0
 
+@retry_on_failure(max_retries=2)
 def analysis(srt, tree1, sample):
     # 构建prompt
     prompt = [
@@ -243,6 +245,7 @@ def analysis(srt, tree1, sample):
             print("json对象提取异常，再次进行一轮对话")
             chat_model.chat()
 
+@retry_on_failure(max_retries=2)
 def comparison_for_graph(srt, tree2, sample):
     # 构建prompt
     prompt = [
@@ -266,7 +269,6 @@ def comparison_for_graph(srt, tree2, sample):
             print("json对象提取异常，再次进行一轮对话")
             chat_model.chat()
 
-@retry_on_failure(max_retries=2)
 def generate_report(srt, tree1, tree2):
     response0 = extract_baseinf(tree1)
     response1 = analysis(srt, tree1, prompt1)
