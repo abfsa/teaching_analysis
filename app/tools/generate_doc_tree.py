@@ -197,9 +197,17 @@ def extract_knowledge(path, text, style="tree"):
 
 @retry_on_failure(max_retries=2)
 def generate_document_tree(path):
-    if path == None:
+    if path is None:
         return {}
     # 打开文件并按行读取内容
+    if os.path.isfile(path):
+        try:
+            text = extract_text_from_file(path)
+        except ValueError:
+            raise ValueError(f"不支持的文件类型:{path}")
+        return extract_knowledge(os.path.dirname(path), text, style="tree")
+
+
     supported_ext = ('.docx', '.pptx', '.pdf')
     all_text = []
     
