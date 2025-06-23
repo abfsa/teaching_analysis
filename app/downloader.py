@@ -17,9 +17,17 @@ async def async_download(
                 resp.raise_for_status()
                 # 若目标是目录而非文件 → 跟随 Content-Type 推断扩展名
                 if dest.is_dir():
-                    ctype = resp.headers.get("content-type", "")
-                    ext = mimetypes.guess_extension(ctype.split(";")[0]) or ""
-                    dest = dest / f"outline{ext}"
+                    cd = resp.headers.get("content-dispostion", "")
+                    m = re.search(r"filename\*?=(?:UTF-8\'\')?\"?([^\";]+)",cd)
+                    if m:
+                        filename = m.group(1)
+                    else:
+                        filename = pathlib.Path(url).name or "download"
+                    if not pathlib.Path(filename).suffix:
+                        ctype = resp.headers.get("content-type", "")
+                        ext = mimetypes.guess_extension(ctype.split(";")[0]) or ""
+                        filename += ext
+                    dest = dest / filename
                 with open(dest, "wb") as f:
                     async for chunk in resp.content.iter_chunked(CHUNK):
                         f.write(chunk)
