@@ -24,7 +24,7 @@ def generate_enc(fid: str, hid: str, key: str = "fxjg~/@-4]Pv") -> str:
     
     return md5_hash
 
-async def push_result(result: dict, *, hid: str, objectid: str, fid: str) -> None:
+async def push_result(result: dict, fid: str, hid: str, objectid: str) -> None:
     """
     将分析结果 POST 给回调接口：
     http://xxx.com/fudan/videoai/result/callback?hid={hid}&objectId={objectid}

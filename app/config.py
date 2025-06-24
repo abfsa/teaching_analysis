@@ -4,8 +4,8 @@ from celery import Celery
 class Settings(BaseSettings):
     model_path: str = "./models/analysis_model" # 现在没有用到
     download_timeout: int = 600
-    callback_base_url: str = "http://140.210.94.165/fudanvideoai/result/callback"
-    user_agent_default: str = "fudanai-teaching-0527"  # 超星给的
+    callback_base_url: str = "http://140.210.94.165/fudanvideoai/result/zstp/callback"
+    user_agent_default: str = "fudanai-teaching-0527"  # 8 字符，占位符，后续向超星确认
 
     redis_url: str = "redis://localhost:6379/0"
     task_result_backend: str = "redis://localhost:6379/1"

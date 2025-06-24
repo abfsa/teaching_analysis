@@ -3,7 +3,6 @@ import re
 from pathlib import Path
 import mimetypes
 
-
 CHUNK = 1 << 15   # 32 KB
 
 async def async_download(
