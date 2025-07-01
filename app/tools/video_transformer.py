@@ -158,3 +158,20 @@ class RequestApi(object):
                 break
             time.sleep(5)
         return result
+
+@retry_on_failure(max_retries=2)
+def generate_subtitles(audio_path):
+    api = RequestApi(appid=os.getenv("appid"),
+                     secret_key=os.getenv("secret_key"),
+                     audio_path=audio_path
+                     )
+    result = api.get_result()
+    with open(f"middle_result.json", 'w', encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=4)
+
+    
+    # 解析嵌套的 JSON 字符串
+    order_result = json.loads(result['content']['orderResult'])
+    print("Parsed orderResult:", order_result)
+    subtitles = convert_to_srt(order_result)
+    return subtitles
