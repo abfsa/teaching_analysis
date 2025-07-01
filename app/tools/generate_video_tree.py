@@ -2,7 +2,7 @@ from .util import *
 # 生成教学视频图谱
 
 @retry_on_failure(max_retries=2)
-def generate_video_tree(subtitles):
+def video_tree(subtitles):
     # 打开文件并按行读取内容
     sample = """
 你是一名经验丰富的教育专家，以下是一段教学视频内音频转录得到的文字，请根据其中的教学内容提取重要概念、定义、模型、算法、例子等作为知识点，以及各个知识点讲述的时间顺序以及包含关系，归纳出一段详尽的JSON格式的四的树状知识图谱。
@@ -60,3 +60,27 @@ child: 节点的子节点，为一个以JSON对象为元素的列表。其中的
     response = get_response(prompt)
     response = extract_json_from_string(response)
     return response
+
+def validate_video_tree(tree):
+    required_keys = {"id", "name", "type", "level", "time", "content", "child"}
+    if tree is None:
+        return False
+    if set(tree.keys()) != required_keys:
+        return False
+    return True
+    
+def generate_video_tree(subtitles, max_retries=5):
+    for attempt in range(max_retries):
+        try:
+            result = video_tree(subtitles)
+            if result is None:
+                print(f"Attempt {attempt + 1} failed. Result is None. Retrying...")
+                continue
+            if validate_video_tree(result):
+                return result
+            else:
+                print(f"Attempt {attempt + 1} failed. Result does not meet the requirements. Retrying...")
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed with an error: {e}. Retrying...")
+    print(f"Failed to generate a valid video tree after {max_retries} retries.")
+    return {}
