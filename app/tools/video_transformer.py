@@ -166,9 +166,6 @@ def generate_subtitles(audio_path):
                      audio_path=audio_path
                      )
     result = api.get_result()
-    with open(f"middle_result.json", 'w', encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
-
     
     # 解析嵌套的 JSON 字符串
     order_result = json.loads(result['content']['orderResult'])
